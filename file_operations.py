@@ -42,7 +42,9 @@ def gather_paths_all(jpg_path,num_classes=16):
       labels[i][label[i]-1]=1
   return ima,label,labels
 
-def gather_paths_some(jpg_path,num_classes=16,fraction=0.5,label_map):
+label_map8=['ulcerative-colitis', 'normal-cecum', 'normal-z-line', 'dyed-lifted-polyps', 'dyed-resection-margins', 'esophagitis', 'normal-pylorus', 'polyps']
+
+def gather_paths_some(jpg_path,num_classes=16,fraction=0.5,label_map=label_map8):
     print("Extracting Fraction of \t",fraction)
     i=0
     
