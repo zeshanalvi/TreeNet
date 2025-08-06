@@ -42,19 +42,10 @@ def gather_paths_all(jpg_path,num_classes=16):
       labels[i][label[i]-1]=1
   return ima,label,labels
 
-def gather_paths_some(jpg_path,num_classes=16,fraction=0.5):
+def gather_paths_some(jpg_path,num_classes=16,fraction=0.5,label_map):
     print("Extracting Fraction of \t",fraction)
     i=0
-    if(num_classes==16):
-        label_map=label_map16
-    elif(num_classes==8):
-        label_map=label_map8
-    elif(num_classes==36):
-        label_map=label_map36
-    elif(num_classes==23):
-        label_map=label_map23
-  
-  
+    
     folder=os.listdir(jpg_path)
     count=0
     if (os.path.isfile(jpg_path+folder[0])):
