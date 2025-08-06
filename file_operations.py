@@ -40,7 +40,7 @@ class Dataset:
         for f in os.listdir(jpg_path+fldr+"/"):
             im=jpg_path+fldr+"/"+f
             ima[i]=im
-            label[i]=label_map.index(fldr)+1
+            label[i]=self.label_map.index(fldr)+1
             i+=1
         if(count<=i):
             break # All images processed
@@ -74,7 +74,7 @@ class Dataset:
             for f in os.listdir(jpg_path+fldr+"/"):
                 im=jpg_path+fldr+"/"+f
                 ima[i]=im
-                label[i]=label_map.index(fldr)+1
+                label[i]=self.label_map.index(fldr)+1
                 i+=1
                 br+=1
                 #print(br,i,math.ceil(len(os.listdir(jpg_path+fldr+"/"))/2))
@@ -102,7 +102,7 @@ class Dataset:
   def gather_images_from_paths(self,start,count):
     jpg_path=self.images_base_path
     print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(jpg_path))
-    ima=np.zeros((count,img_rows,img_cols,3),np.uint8)
+    ima=np.zeros((count,self.img_rows,self.img_cols,self.channels),np.uint8)
     for i in range(count):
         #print(i,count,jpg_path[start+i])
         img=cv2.imread(jpg_path[start+i])
@@ -123,10 +123,10 @@ class Dataset:
   def gather_images_from_paths_HSV(self,start,count):
     jpg_path=self.images_base_path
     print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(jpg_path))
-    ima=np.zeros((count,img_rows,img_cols,3),np.uint8)
+    ima=np.zeros((count,self.img_rows,self.img_cols,self.channels),np.uint8)
     for i in range(count):
       img=cv2.imread(jpg_path[start+i])
-      img_rgb = cv2.resize(img, (img_rows, img_cols)).astype(np.uint8)
+      img_rgb = cv2.resize(img, (self.img_rows, self.img_cols)).astype(np.uint8)
       img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
       ima[i]=img_hsv
     return ima
