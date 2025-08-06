@@ -138,3 +138,4 @@ def print_scores(y_true, y_pred):
     acc = accuracy_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred, average='weighted')
     print(f"Accuracy: {acc:.2f}, F1 Score: {f1:.2f}")
+  return acc
