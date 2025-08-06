@@ -131,3 +131,8 @@ def gather_images_from_paths_HSV(jpg_path,start,count,img_rows=224,img_cols=224)
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
     ima[i]=img_hsv
   return ima
+
+def print_scores(y_true, y_pred):
+    acc = accuracy_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred, average='weighted')
+    print(f"Accuracy: {acc:.2f}, F1 Score: {f1:.2f}")
