@@ -100,12 +100,12 @@ class Dataset:
     return ima, label, labels
 
   def gather_images_from_paths(self,start,count):
-    jpg_path=self.images_base_path
-    print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(jpg_path))
+    paths_all=self.file_names
+    print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(paths_all))
     ima=np.zeros((count,self.img_rows,self.img_cols,self.channels),np.uint8)
     for i in range(count):
-        #print(i,count,jpg_path[start+i])
-        img=cv2.imread(jpg_path[start+i])
+        #print(i,count,paths_all[start+i])
+        img=cv2.imread(paths_all[start+i])
         im = cv2.resize(img, (self.img_rows, self.img_cols)).astype(np.uint8)
         ima[i]=im
     return ima
