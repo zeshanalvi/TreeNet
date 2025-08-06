@@ -94,7 +94,7 @@ class Dataset:
     ima_selected, label_selected = zip(*selected)
     ima = list(ima_selected)
     label = list(label_selected)    
-    labels=np.zeros((frac,num_classes),dtype=float)    
+    labels=np.zeros((frac,self.num_classes),dtype=float)    
     for i in range(frac):
         labels[i][label[i]-1]=1
     return ima, label, labels
