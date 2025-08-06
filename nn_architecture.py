@@ -16,7 +16,7 @@ class ReduceLRBacktrack(ReduceLROnPlateau):
                 print("Backtracking to best model before reducting LR")
                 self.model.load_weights(self.best_path)
 
-      super().on_epoch_end(epoch, logs) # actually reduce LR
+    super().on_epoch_end(epoch, logs) # actually reduce LR
 
 class TreeNet:
   def __init__(self,selected_model_name,output_layer,weights,dataset,epochs,test_size,trained_weights_path):
