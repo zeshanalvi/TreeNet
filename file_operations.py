@@ -1,3 +1,5 @@
+from sklearn.metrics import accuracy_score, f1_score
+
 def gather_paths_all(jpg_path,num_classes=16):
   i=0
   if(num_classes==16):
