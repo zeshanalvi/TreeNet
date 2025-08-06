@@ -2,18 +2,6 @@ from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 import numpy as np, random, os, math, cv2, os, h5py, pandas as pd
 
 
-label_map36=['barretts', 'barretts-short-segment', 'bbps-0-1', 'bbps-2-3','cecum', 'normal-cecum', 'dyed-lifted-polyps', 'dyed-resection-margins',
-         'esophagitis','esophagitis-a','esophagitis-b-d','hemorrhoids', 'ileum', 'impacted-stool','normal-z-line','polyps','pylorus','normal-pylorus',
-         'retroflex-rectum','retroflex-stomach','ulcerative-colitis','ulcerative-colitis-0-1','ulcerative-colitis-1-2','ulcerative-colitis-2-3',
-         'ulcerative-colitis-grade-1','ulcerative-colitis-grade-2','ulcerative-colitis-grade-3',
-         'lesion', 'dysplasia', 'cancer', 'blurry-nothing', 'colon-clear', 'stool-inclusions', 'stool-plenty', 'instruments', 'out-of-patient']
-
-label_map23=['barretts', 'barretts-short-segment', 'bbps-0-1', 'bbps-2-3', 'cecum', 'dyed-lifted-polyps', 'dyed-resection-margins', 'esophagitis-a', 'esophagitis-b-d',
-             'hemorrhoids', 'ileum', 'impacted-stool', 'normal-z-line', 'polyps', 'pylorus', 'retroflex-rectum', 'retroflex-stomach',
-             'ulcerative-colitis-0-1', 'ulcerative-colitis-1-2', 'ulcerative-colitis-2-3', 'ulcerative-colitis-grade-1', 'ulcerative-colitis-grade-2', 'ulcerative-colitis-grade-3'] 
-label_map16=['retroflex-rectum', 'out-of-patient', 'ulcerative-colitis', 'normal-cecum', 'normal-z-line', 'dyed-lifted-polyps', 'blurry-nothing', 'retroflex-stomach', 'instruments', 'dyed-resection-margins', 'stool-plenty', 'esophagitis', 'normal-pylorus', 'polyps', 'stool-inclusions', 'colon-clear']
-label_map8=['ulcerative-colitis', 'normal-cecum', 'normal-z-line', 'dyed-lifted-polyps', 'dyed-resection-margins', 'esophagitis', 'normal-pylorus', 'polyps']
-
 class Dataset:
   def __init__(self, label_map,num_classes, images_base_path):
     self.label_map = label_map
