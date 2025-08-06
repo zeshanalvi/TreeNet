@@ -15,7 +15,7 @@ class Dataset:
     self.label=[]
     self.labels=[]
 
-  def gather_paths_all():
+  def gather_paths_all(self):
     i=0
     jpg_path=self.images_base_path
     folder=os.listdir(jpg_path)
@@ -48,7 +48,7 @@ class Dataset:
         labels[i][label[i]-1]=1 # Labels to Label Vectors
     return ima, label, labels
 
-  def gather_paths_some(fraction=0.5):
+  def gather_paths_some(self,fraction=0.5):
     jpg_path=self.images_base_path
     print("Extracting Fraction of \t",fraction)
     i=0
@@ -99,7 +99,7 @@ class Dataset:
         labels[i][label[i]-1]=1
     return ima, label, labels
 
-  def gather_images_from_paths(start,count):
+  def gather_images_from_paths(self,start,count):
     jpg_path=self.images_base_path
     print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(jpg_path))
     ima=np.zeros((count,img_rows,img_cols,3),np.uint8)
@@ -110,7 +110,7 @@ class Dataset:
         ima[i]=im
     return ima
 
-  def get_images():
+  def get_images(self):
     paths=self.file_names
     count=len(paths)
     ima=np.zeros((count,self.img_rows,self.img_cols,self.channels),np.uint8)
@@ -120,7 +120,7 @@ class Dataset:
         ima[i]=im
     return ima
 
-  def gather_images_from_paths_HSV(start,count):
+  def gather_images_from_paths_HSV(self,start,count):
     jpg_path=self.images_base_path
     print('Stats of Images Start:',start,' To:',(start+count),'All Images:',len(jpg_path))
     ima=np.zeros((count,img_rows,img_cols,3),np.uint8)
