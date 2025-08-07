@@ -38,6 +38,7 @@ class TreeNet:
     self.test_size=test_size#0.33
     self.init_weights=weights#'imagenet'
     self.trained_weights_path=trained_weights_path#"abc.h5"
+    self.dataset=dataset
 
   
   def alter_last_layer(self):
@@ -52,17 +53,17 @@ class TreeNet:
     model.compile(loss='mean_squared_error', optimizer=adag)
     return model
     
-  def finetune(self,X=None,Ys=None):
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Ys, test_size=0.33, random_state=5)
-    model=alter_last_layer(self)
+  def finetune(self):
+    X_train, X_test, Y_train, Y_test = train_test_split(self.dataset.images, self.dataset.labels, test_size=self.test_size, random_state=5)
+    self.densenet169=self.alter_last_layer(self)
     #callback=ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     model_checkpoint_path = "/kaggle/working/"+self.selected_model_name+"_"+str(self.epoch)+"_updatingLR_best.h5"
     c1 = ModelCheckpoint(model_checkpoint_path,save_best_only=True,monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     c2 = ReduceLRBacktrack(best_path=model_checkpoint_path, monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     c3 = EarlyStopping(monitor='val_loss', patience=10, min_delta=0.000001)
-    model.fit(X_train, Y_train,batch_size=batch_size,epochs=nb_epoch,shuffle=True,verbose=0,validation_data=(X_test, Y_test),callbacks=[c1,c2])
-    model.save(self.trained_weights_path)
-    return model
+    self.densenet169.fit(X_train, Y_train,batch_size=batch_size,epochs=nb_epoch,shuffle=True,verbose=0,validation_data=(X_test, Y_test),callbacks=[c1,c2])
+    self.densenet169.save(self.trained_weights_path)
+    return self.densenet169
 
 def prediction(model=None,data_path=None,chunk_size=500,data_size=0,num_classes=16):
     paths,Y_true1,Y_true=gather_paths_all(data_path,num_classes=num_classes)
