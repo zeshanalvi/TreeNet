@@ -1,5 +1,7 @@
 from tensorflow.python.platform import tf_logging as logging
 from keras.applications.densenet import DenseNet169
+from keras.applications.resnet import ResNet152, ResNet50
+
 import logging
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 
