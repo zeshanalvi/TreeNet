@@ -53,7 +53,7 @@ class TreeNet:
     base_model=self.densenet169
     if(self.selected_model_name=="resnet"):
       base_model=self.resnet152
-    x = base_model.get_layer(output_layer).output
+    x = base_model.get_layer(self.output_layer).output
     x = Dense(self.num_classes, name="output")(x)
     model = Model(base_model.input, outputs=x)
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
@@ -73,12 +73,12 @@ class TreeNet:
     self.densenet169.save(self.trained_weights_path)
     return self.densenet169
 
-def prediction(model=None,data_path=None,chunk_size=500,data_size=0,num_classes=16):
-    paths,Y_true1,Y_true=gather_paths_all(data_path,num_classes=num_classes)
+def prediction(self,chunk_size=500):
+    paths,Y_true1,Y_true=self.dataset.gather_paths_all()
     Y_pred=np.zeros((len(Y_true1)),float)
-    Y_preds=np.zeros((len(Y_true1),num_classes),float)
-    if(data_size==0):
-      data_size=len(paths)
+    Y_preds=np.zeros((len(Y_true1),self.dataset.num_classes),float)
+    
+    data_size=len(paths)
     chunks=int(data_size/chunk_size)
     for chunk in range(chunks+1):
         st,end=compute_chunk(data_size,chunk,chunk_size,chunks)
@@ -86,7 +86,7 @@ def prediction(model=None,data_path=None,chunk_size=500,data_size=0,num_classes=
           break
         print("Progress of dataset ",data_name," is at ",st, " to ",end,)
         X=get_images(paths[st:end])
-        Y=model.predict(X)
+        Y=self.densenet169.predict(X)
         for i in range(st,end):
           Y_pred[i]=np.argmax(Y[i-st])+1
           Y_preds[i,:]=Y[i-st,:]
