@@ -78,7 +78,7 @@ class TreeNet:
     c1 = ModelCheckpoint(model_checkpoint_path,save_best_only=True,monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     c2 = ReduceLRBacktrack(best_path=model_checkpoint_path, monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     c3 = EarlyStopping(monitor='val_loss', patience=10, min_delta=0.000001)
-    self.densenet169.fit(X_train, Y_train,batch_size=batch_size,epochs=nb_epoch,shuffle=True,verbose=0,validation_data=(X_test, Y_test),callbacks=[c1,c2])
+    self.densenet169.fit(X_train, Y_train,batch_size=self.batch_size,epochs=self.epochs,shuffle=True,verbose=0,validation_data=(X_test, Y_test),callbacks=[c1,c2])
     self.densenet169.save(self.trained_weights_path)
     return self.densenet169
 
