@@ -2,7 +2,6 @@ from tensorflow.python.platform import tf_logging as logging
 from keras.applications.densenet import DenseNet169
 from keras.applications.resnet import ResNet152, ResNet50
 
-import logging
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 
 from sklearn.model_selection import train_test_split
@@ -64,7 +63,7 @@ class TreeNet:
     
   def finetune(self):
     X_train, X_test, Y_train, Y_test = train_test_split(self.dataset.images, self.dataset.labels, test_size=self.test_size, random_state=5)
-    self.densenet169=self.alter_last_layer(self)
+    self.densenet169=self.alter_last_layer()
     #callback=ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
     model_checkpoint_path = "/kaggle/working/"+self.selected_model_name+"_"+str(self.epoch)+"_updatingLR_best.h5"
     c1 = ModelCheckpoint(model_checkpoint_path,save_best_only=True,monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
