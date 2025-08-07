@@ -9,6 +9,14 @@ from sklearn.metrics import accuracy_score, log_loss
 from sklearn.utils import shuffle
 #from keras.callbacks import ReduceLROnPlateau
 
+from keras.layers import Input, merge, ZeroPadding2D, Flatten, Dense, Dropout, Activation
+from keras.layers.convolutional import Convolution2D
+from keras.layers.pooling import AveragePooling2D, GlobalAveragePooling2D, MaxPooling2D
+from keras.layers.normalization import BatchNormalization
+from keras.models import Model
+from keras import Sequential, backend as K, optimizers
+from keras.callbacks import ModelCheckpoint, LearningRateScheduler, ReduceLROnPlateau, EarlyStopping
+from keras.optimizers import SGD, Adagrad
 
 
 class ReduceLRBacktrack(ReduceLROnPlateau):
