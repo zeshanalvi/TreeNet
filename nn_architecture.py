@@ -5,6 +5,13 @@ from keras.applications.resnet import ResNet152, ResNet50
 import logging
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, log_loss
+from sklearn.utils import shuffle
+#from keras.callbacks import ReduceLROnPlateau
+
+
+
 class ReduceLRBacktrack(ReduceLROnPlateau):
     def __init__(self, best_path, *args, **kwargs):
         super(ReduceLRBacktrack, self).__init__(*args, **kwargs)
