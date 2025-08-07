@@ -73,7 +73,7 @@ class TreeNet:
     self.densenet169.save(self.trained_weights_path)
     return self.densenet169
 
-def prediction(self,chunk_size=500):
+def prediction(self,finetuned_model,chunk_size=500):
     paths,Y_true1,Y_true=self.dataset.gather_paths_all()
     Y_pred=np.zeros((len(Y_true1)),float)
     Y_preds=np.zeros((len(Y_true1),self.dataset.num_classes),float)
@@ -86,7 +86,7 @@ def prediction(self,chunk_size=500):
           break
         print("Progress of dataset ",data_name," is at ",st, " to ",end,)
         X=get_images(paths[st:end])
-        Y=self.densenet169.predict(X)
+        Y=finetuned_model.predict(X)
         for i in range(st,end):
           Y_pred[i]=np.argmax(Y[i-st])+1
           Y_preds[i,:]=Y[i-st,:]
