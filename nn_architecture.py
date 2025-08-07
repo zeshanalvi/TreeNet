@@ -42,7 +42,7 @@ class ReduceLRBacktrack(ReduceLROnPlateau):
 
 
 class TreeNet:
-  def __init__(self,selected_model_name,output_layer,weights,dataset,epochs,test_size,trained_weights_path):
+  def __init__(self,selected_model_name,output_layer,weights,dataset,epochs,test_size,trained_weights_path,batch_size=16):
     self.densenet169=DenseNet169(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
     self.resnet152=ResNet152(include_top=True, weights=None, input_tensor=None, input_shape=None, pooling=None, classes=1000)
     #self.selected_model="dense"
@@ -55,6 +55,7 @@ class TreeNet:
     self.init_weights=weights#'imagenet'
     self.trained_weights_path=trained_weights_path#"abc.h5"
     self.dataset=dataset
+    self.batch_size=batch_size
 
   
   def alter_last_layer(self):
