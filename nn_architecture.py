@@ -1,54 +1,46 @@
-from tensorflow.python.platform import tf_logging as logging
-from keras.applications.densenet import DenseNet169
-from keras.applications.resnet import ResNet152, ResNet50
-
-from tensorflow.keras.callbacks import ReduceLROnPlateau
-
+import numpy as np
+import pandas as pd
+import os
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, log_loss
-from sklearn.utils import shuffle
-#from keras.callbacks import ReduceLROnPlateau
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix,f1_score, matthews_corrcoef, precision_score, recall_score
+#classifiers
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier,BaggingClassifier, ExtraTreesClassifier, AdaBoostClassifier
+#!pip install xgboost
+#!pip install lightgbm
+#!pip install catboost
 
-from keras.layers import Input, merge, ZeroPadding2D, Flatten, Dense, Dropout, Activation
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import AveragePooling2D, GlobalAveragePooling2D, MaxPooling2D
-from keras.layers.normalization import BatchNormalization
-from keras.models import Model
-from keras import Sequential, backend as K, optimizers
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler, ReduceLROnPlateau, EarlyStopping
-from keras.optimizers import SGD, Adagrad
+from xgboost import XGBClassifier
+import lightgbm as lgb
+from catboost import CatBoostClassifier
+import random
 
 
-class ReduceLRBacktrack(ReduceLROnPlateau):
-    def __init__(self, best_path, *args, **kwargs):
-        super(ReduceLRBacktrack, self).__init__(*args, **kwargs)
-        self.best_path = best_path
 
-    def on_epoch_end(self, epoch, logs=None):
-        current = logs.get(self.monitor)
-        if current is None:
-            logging.warning(
-                'Reduce LR on plateau conditioned on metric `%s` which is not available. Available metrics are: %s',
-                self.monitor, ','.join(list(logs.keys()))
-            )
-
-        if not self.monitor_op(current, self.best):  # not a new best
-            if not self.in_cooldown():               # and we're not in cooldown
-                if self.wait + 1 >= self.patience:   # going to reduce lr
-                    print("Backtracking to best model before reducing LR")
-                    self.model.load_weights(self.best_path)
-
-        super().on_epoch_end(epoch, logs)  # actually reduce LR
-
+base_path="/kaggle/input/kvasirv1/"
+class_count=8
+chunk=0.5
+files=[base_path+f for f in os.listdir(base_path) if ".csv" in f and "dev_" in f and "_500_" not in f and "Haralick" not in f and "lbp." not in f]# and "deep_" not in f]
+files.sort()
+print(len(files),files)
+for f in files:
+    df=pd.read_csv(f)
+    #print(df.columns)
+    df['filename']=df['class1']+"_"+df['img']
+    
+    df=df.sort_values(by='filename')
+    print(f.split("/")[-1],df.shape,df['filename'][:5])
 
 class TreeNet:
   def __init__(self,selected_model_name,output_layer,weights,dataset,epochs,test_size,trained_weights_path,batch_size=16):
-    self.densenet169=DenseNet169(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
-    self.resnet152=ResNet152(include_top=True, weights=None, input_tensor=None, input_shape=None, pooling=None, classes=1000)
+    self.layers={}
+    self.layer_count=2
+    #self.densenet169=DenseNet169(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
+    #self.resnet152=ResNet152(include_top=True, weights=None, input_tensor=None, input_shape=None, pooling=None, classes=1000)
     #self.selected_model="dense"
     #self.output_layer='avg_pool'
-    self.selected_model_name=selected_model_name
-    self.output_layer=output_layer
+    #self.selected_model_name=selected_model_name
+    #self.output_layer=output_layer
     self.num_classes=dataset.num_classes
     self.epochs=epochs#5
     self.test_size=test_size#0.33
@@ -57,61 +49,155 @@ class TreeNet:
     self.dataset=dataset
     self.batch_size=batch_size
 
-  
-  def alter_last_layer(self):
-    base_model=self.densenet169
-    if(self.selected_model_name=="resnet"):
-      base_model=self.resnet152
-    x = base_model.get_layer(self.output_layer).output
-    x = Dense(self.num_classes, name="output")(x)
-    model = Model(base_model.input, outputs=x)
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    adag=Adagrad(learning_rate=0.01,initial_accumulator_value=0.1,epsilon=1e-07,name="Adagrad")
-    model.compile(loss='mean_squared_error', optimizer=adag)
-    return model
+  def read_all(files_dev):
+    train_X=pd.DataFrame()
+    train_Y=pd.DataFrame()
+
+    for f in files_dev:
+        print(f,train_X.shape)
+        if("lbp" in f):
+            df=pd.read_csv(f).iloc[:,1:]
+            df["file_name"]=df['Yl']+"__"+df['filename'].astype('str')+".jpg"
+            df.set_index("file_name",inplace=True)
+            train_Y=df['Yl']
+            df.drop(columns=['Yl','Y','filename','Unnamed: 0'],axis=1,inplace=True,errors='ignore')
+            if(train_X.shape[0]==0):
+                train_X=df
+            else:
+                train_X=train_X.merge(df,on='key',how='inner',suffixes=("","_"+file_name.split('/')[-1].split(".")[0][4:9]))
+
+        elif("densenet" in f):
+            df=pd.read_csv(f).iloc[:,1:]
+            df[['Y','img']] = df['image_name'].str.split('__',expand=True)
+            df.rename(columns={"image_name": "file_name"},inplace=True)
+            df.set_index("file_name",inplace=True)
+            
+            train_Y=df['Y']
+            df.drop(['Actual','Pred','Y','img','Unnamed: 0'],axis=1,inplace=True,errors='ignore')
+            if(train_X.shape[0]==0):
+                train_X=df
+            else:
+                train_X=train_X.merge(df,on='key',how='inner',suffixes=("","_"+file_name.split('/')[-1].split(".")[0][4:9]))
+        elif("mobilenetv2" in f):
+            df=pd.read_csv(f).iloc[:,1:-2].set_index('image_name')
+            if(train_X.shape[0]==0):
+                train_X=df
+            else:
+                train_X=train_X.merge(df,on='key',how='inner',suffixes=("","_"+file_name.split('/')[-1].split(".")[0][4:9]))
+        else:
+            df=pd.read_csv(f).iloc[:,1:]
+            df["file_name"]=df['class1']+"__"+df['img'].astype('str')
+            df.set_index("file_name",inplace=True)
+            train_Y=df['class1']
+            df.drop(['class1','img','Unnamed: 0'],axis=1,inplace=True,errors='ignore')
+            print(train_X.shape,df.shape)
+            if(train_X.shape[0]==0):
+                train_X=df
+            else:
+                train_X=train_X.merge(df,on='key',how='inner',suffixes=("","_"+file_name.split('/')[-1].split(".")[0][4:9]))
+
+    print(train_X.shape,train_Y.shape)
+    return train_X,train_Y
+
+  def design_network(self):
+    for i in range(self.layer_count):
+      self.layers["layer_"+str(i)]={}
+      if(i%2==0):
+        self.layers["layer_"+str(i)]["RF_1"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["RF_2"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["RF_3"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["RF_4"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["RF_5"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        self.layers["layer_"+str(i)]["RF_6"]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        self.layers["layer_"+str(i)]["ET_7"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["ET_8"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["ET_9"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        self.layers["layer_"+str(i)]["ET_10"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["ET_11"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+        #self.layers["layer_"+str(i)]["ET_12"]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+      else:
+        #self.layers["layer_"+str(i)]["XG_1"]=XGBClassifier()
+        self.layers["layer_"+str(i)]["XG_2"]=XGBClassifier()
+        #self.layers["layer_"+str(i)]["CB_3"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        self.layers["layer_"+str(i)]["CB_4"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        #self.layers["layer_"+str(i)]["CB_5"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        self.layers["layer_"+str(i)]["CB_6"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        #self.layers["layer_"+str(i)]["CB_7"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        #self.layers["layer_"+str(i)]["CB_8"]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+        #self.layers["layer_"+str(i)]["BC_9"]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,4)*50, random_state=42)
+        #self.layers["layer_"+str(i)]["BC_10"]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,4)*50, random_state=42)
+        self.layers["layer_"+str(i)]["BC_11"]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,4)*50, random_state=42)
+        #self.layers["layer_"+str(i)]["BC_12"]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,4)*50, random_state=42)
+
+
+train_Y, uniques = pd.factorize(train_Y)
+print(train_Y)  # mapped values from 0 to 7 (or 0 to n-1)
+print(uniques)   # original values corresponding to each label
+
+
+
+  def portion(self,chunk=0.5):
+    trainX=train_X[0] #merge all
+    for i,X in enumerate(train_X[1:]):
+      trainX=trainX.merge(X,left_index=True,right_index=True,how='inner',suffixes=("","_"+files[i+1].split('/')[-1].split(".")[0][4:9]))
+    #train_Y-=1
+    shuffled_indices = np.random.permutation(len(trainX))
+    # Apply the same shuffle to both
+    trainX = trainX.iloc[shuffled_indices].reset_index(drop=True)
+    train_Y = train_Y[shuffled_indices]
+    # Select 50% of the rows
+    half_size = int(len(trainX)*chunk)
+    trainX = trainX.iloc[:half_size]
+    train_Y = train_Y[:half_size]
+    return trainX,train_Y
+
+  def fit_model(self):
+    for l,layer in enumerate(layers):
+      print("Input Shape Before Layer ",layer,"\t",trainX.shape)
+      preds={}
+      for i,forest in enumerate(layers[layer]):
+        if(l==0):
+          print("Started\n Forest\t",forest,"\t of Layer:",l+1)
+          preds[forest]=layers[layer][forest].fit(trainX, train_Y).predict_proba(trainX)
+        else:
+          print("Started\n Forest\t",forest,"\t of Layer:",l+1)
+          if("CB_" in forest):
+            #print("CB_ started")
+            preds[forest]=layers[layer][forest].fit(trainX, train_Y,verbose=0).predict_proba(trainX)
+          else:
+            preds[forest]=layers[layer][forest].fit(trainX, train_Y).predict_proba(trainX)
+      for forest in layers[layer]:
+        print(trainX.shape,)
+        trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
+      print(len(preds))
+
+
+
+train_X=[]
+test_X=[]
+train_Y=None
+test_Y=None
+for f in files:
+    print(f.split("/")[-1])
+    df=pd.read_csv(f)
+    df['filename']=df['class1']+"_"+df['img']
+    #df['filename']=df['labels']+"_"+df['filename']
+    df=df.sort_values(by='filename')
+    train_X.append(df.drop(columns={'class','img','class1','filename'},axis=1))
+    train_Y=df["class"]-1
+    print(df.shape,len(train_X),train_X[0].shape)
+
+for f in files:
+    f=f.replace("dev_","val_")
+    print(f)
+    df=pd.read_csv(f)
+    df['filename']=df['class1']+"_"+df['img']
+    #df['filename']=df['labels']+"_"+df['filename']
+    df=df.sort_values(by='filename')
     
-  def finetune(self):
-    X_train, X_test, Y_train, Y_test = train_test_split(self.dataset.images, self.dataset.labels, test_size=self.test_size, random_state=5)
-    self.densenet169=self.alter_last_layer()
-    #callback=ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
-    model_checkpoint_path = "/kaggle/working/"+self.selected_model_name+"_"+str(self.epochs)+"_updatingLR_best.h5"
-    c1 = ModelCheckpoint(model_checkpoint_path,save_best_only=True,monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
-    c2 = ReduceLRBacktrack(best_path=model_checkpoint_path, monitor='loss', factor=0.1, patience=5, verbose=0, mode='auto', min_delta=0.0001, cooldown=0, min_lr=1e-7)
-    c3 = EarlyStopping(monitor='val_loss', patience=10, min_delta=0.000001)
-    self.densenet169.fit(X_train, Y_train,batch_size=self.batch_size,epochs=self.epochs,shuffle=True,verbose=0,validation_data=(X_test, Y_test),callbacks=[c1,c2])
-    self.densenet169.save(self.trained_weights_path)
-    return self.densenet169
-
-def prediction(self,finetuned_model,chunk_size=500):
-    paths,Y_true1,Y_true=self.dataset.gather_paths_all()
-    Y_pred=np.zeros((len(Y_true1)),float)
-    Y_preds=np.zeros((len(Y_true1),self.dataset.num_classes),float)
-    
-    data_size=len(paths)
-    chunks=int(data_size/chunk_size)
-    for chunk in range(chunks+1):
-        st,end=compute_chunk(data_size,chunk,chunk_size,chunks)
-        if(st==end):
-          break
-        print("Progress of dataset ",data_name," is at ",st, " to ",end,)
-        X=get_images(paths[st:end])
-        Y=finetuned_model.predict(X)
-        for i in range(st,end):
-          Y_pred[i]=np.argmax(Y[i-st])+1
-          Y_preds[i,:]=Y[i-st,:]
-    return Y_true,Y_pred,Y_preds
-
-def CombinerNet(num_classes=16):
-    model = Sequential()
-    model.add(layers.Dense(32, activation="relu", name="L1"))
-    model.add(layers.Dense(num_classes, activation="softmax", name="L2"))
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-    model.compile(loss='mean_squared_error', optimizer=sgd)
-    return model
-
-def compute_chunk(data_size,chunk,chunk_size,chunks):
-  st=chunk*chunk_size
-  end=(chunk+1)*chunk_size
-  if(end>data_size):
-    end=data_size
-  return st,end
+    test_X.append(df.drop(columns={'class','img','class1','filename'},axis=1))
+    #test_X.append(df.drop(columns={'labels','filename','Y'},axis=1))
+    test_Y=df["class"]-1
+    print(f.split("/")[-1],df.shape,len(test_X),test_X[0].shape)
+df=None
+#train_X=pd.read_csv(f).drop(columns={'labels','filename','Y'},axis=1)
