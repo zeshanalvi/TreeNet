@@ -47,6 +47,20 @@ class Dataset:
     for i in range(count):
         labels[i][label[i]-1]=1 # Labels to Label Vectors
     return ima, label, labels
+  def fractional(self,fraction=0.5):
+    #shuffle
+    frac=int(fraction*len(self.images))
+    print("selected ",frac," images from ",len(self.images))
+    combined = list(zip(self.images, self.label))
+    random.shuffle(combined)
+    selected = combined[:frac]
+    ima_selected, label_selected = zip(*selected)
+    ima = list(ima_selected)
+    label = list(label_selected)    
+    labels=np.zeros((frac,self.num_classes),dtype=float)    
+    for i in range(frac):
+        labels[i][label[i]-1]=1
+    return ima, label, labels
 
   def gather_paths_some(self,fraction=0.5):
     jpg_path=self.images_base_path
