@@ -16,7 +16,6 @@ from catboost import CatBoostClassifier
 import random
 
 
-
 base_path="/kaggle/input/kvasirv1/"
 class_count=8
 chunk=0.5
@@ -35,6 +34,7 @@ class TreeNet:
   def __init__(self,selected_model_name,output_layer,weights,dataset,epochs,test_size,trained_weights_path,batch_size=16):
     self.layers={}
     self.layer_count=2
+    
     #self.densenet169=DenseNet169(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000)
     #self.resnet152=ResNet152(include_top=True, weights=None, input_tensor=None, input_shape=None, pooling=None, classes=1000)
     #self.selected_model="dense"
