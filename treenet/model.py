@@ -25,7 +25,7 @@ class TreeNet:
     
   def train(self,trainX,trainY):
     for l,layer in enumerate(self.layers):
-      print("Training Layer\t",l+1,"\t of Forest\t",forest,"\t with input\t",trainX.shape)
+      print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
@@ -59,7 +59,7 @@ class TreeNet:
 
     
   def summary(self):
-    print("Model has"+str(self.layer_count)," layers")
+    print("Model has "+str(self.layer_count)," layers")
     print("Model Layer Breath is "+str(self.breath_count))
     print("Model Details")
     print(self.layers)

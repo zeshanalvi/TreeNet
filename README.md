@@ -29,14 +29,17 @@ from treenet import TreeNet
 model = TreeNet(layer_count=3, breath_count=2)
 
 # Sample training data
-trainX = np.random.rand(100, 8)   # 100 samples, 8 features
-trainY = np.random.randint(0, 2, size=(100, 1))  # Binary labels
+col_labels = [''.join(random.choices(string.ascii_uppercase, k=10)) for _ in range(20)] # labels of 20 columns
+trainXnp = np.random.rand(100, 20)   # 100 samples, 20 features
+trainX = pd.DataFrame(trainXnp, columns=col_labels) # Dataframe
+trainY = np.random.randint(0, 8, size=(100,)) # Multiclass labels with 8 classes
 
 # Train the model
 model.train(trainX, trainY)
 
 # Sample test data
-testX = np.random.rand(10, 8)
+testXnp = np.random.rand(10, 8)
+trainX = pd.DataFrame(trainXnp, columns=col_labels) # Dataframe
 
 # Predict probabilities
 probabilities = model.predict_prob(testX)
