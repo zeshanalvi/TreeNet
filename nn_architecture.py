@@ -1,18 +1,8 @@
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix,f1_score, matthews_corrcoef, precision_score, recall_score
-#classifiers
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier,BaggingClassifier, ExtraTreesClassifier, AdaBoostClassifier
-#!pip install xgboost
-#!pip install lightgbm
-#!pip install catboost
-import numpy as np, pandas as pd
+from sklearn.ensemble import RandomForestClassifier,BaggingClassifier, ExtraTreesClassifier
+import numpy as np, pandas as pd, random
 from xgboost import XGBClassifier
-#import lightgbm as lgb
 from catboost import CatBoostClassifier
-import random
-from file_operations import read_files
-
 class TreeNet:
   def __init__(self,layer_count=2,breath_count=1):
     self.layers={}
