@@ -100,3 +100,15 @@ treenet/
 ├── pyproject.toml
 ├── LICENSE
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Acknowledgments
+
+TreeNet was built to simplify experimentation with layered machine learning structures and provide a lightweight package for educational and prototyping use.
