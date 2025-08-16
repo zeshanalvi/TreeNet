@@ -22,7 +22,7 @@ pip install .
 Here’s a quick example of how to use ```TreeNet```:
 
 ```python
-import numpy as np
+import numpy as np, pandas as pd, random, string
 from treenet import TreeNet
 
 # Initialize the model
@@ -38,8 +38,8 @@ trainY = np.random.randint(0, 8, size=(100,)) # Multiclass labels with 8 classes
 model.train(trainX, trainY)
 
 # Sample test data
-testXnp = np.random.rand(10, 8)
-trainX = pd.DataFrame(trainXnp, columns=col_labels) # Dataframe
+testXnp = np.random.rand(10, 20) # 10 samples, 20 features
+testX = pd.DataFrame(testXnp, columns=col_labels) # Dataframe
 
 # Predict probabilities
 probabilities = model.predict_prob(testX)
