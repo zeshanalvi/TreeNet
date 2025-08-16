@@ -82,3 +82,21 @@ Returns predicted class labels for input samples.
 ```testX (np.ndarray):``` Test features of shape ```(n_samples, n_features)```.
 
 Returns: ```np.ndarray``` of shape ```(n_samples, 1)```.
+
+## Project Structure
+
+```
+treenet/
+│
+├── treenet/
+│   ├── __init__.py
+│   ├── model.py         # Implementation of TreeNet class
+│
+├── tests/
+│   ├── test_model.py    # Unit tests for TreeNet
+│
+├── README.md
+├── setup.py
+├── pyproject.toml
+├── LICENSE
+```
