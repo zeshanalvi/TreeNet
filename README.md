@@ -1,5 +1,15 @@
 # TreeNet
 
+<p align="center">
+  <a href="https://pypi.org/project/dtreenetwork/"><img src="https://img.shields.io/pypi/v/dtreenetwork.svg" alt="PyPI Version"></a>
+  <a href="https://github.com/zeshanalvi/treenet/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/dtreenetwork.svg" alt="License"></a>
+  <a href="https://pepy.tech/project/dtreenetwork/"><img src="https://static.pepy.tech/badge/dtreenetwork" alt="Downloads"></a>
+  <a href="https://pypi.org/project/dtreenetwork/"><img src="https://img.shields.io/pypi/pyversions/dtreenetwork.svg" alt="Python Versions"></a>
+  <a href="https://github.com/zeshanalvi/treenet/stargazers"><img src="https://img.shields.io/github/stars/zeshanalvi/treenet?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/zeshanalvi/treenet/commits/main"><img src="https://img.shields.io/github/last-commit/zeshanalvi/treenet.svg" alt="Last Commit"></a>
+  <a href="https://github.com/zeshanalvi/treenet/issues"><img src="https://img.shields.io/github/issues/zeshanalvi/treenet.svg" alt="Open Issues"></a>
+</p>
+
 TreeNet is a lightweight and customizable machine learning model designed for flexible experimentation with layered network structures. It provides simple training and prediction interfaces and is well-suited for rapid prototyping and educational purposes.
 
 ## Installation
