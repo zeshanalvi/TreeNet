@@ -34,6 +34,7 @@ class TreeNet:
         else:
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY).predict_proba(trainX)
       for forest in self.layers[layer]:
+        print(trainX.shape,preds[forest].shape)
         trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
   def predict_prob(self,testX):
     for l,layer in enumerate(self.layers):
