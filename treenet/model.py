@@ -29,6 +29,7 @@ class TreeNet:
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
+          #trainX = trainX.apply(pd.to_numeric, downcast="float")
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY,verbose=0).predict_proba(trainX)
         else:
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY).predict_proba(trainX)
@@ -64,5 +65,5 @@ class TreeNet:
     print("Model Details")
     print(self.layers)
 
-treenet=TreeNet(2,3)
-treenet.summary()
+#treenet=TreeNet(2,3)
+#treenet.summary()
