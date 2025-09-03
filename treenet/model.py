@@ -37,12 +37,14 @@ class TreeNet:
         trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
   def predict_prob(self,testX):
     for l,layer in enumerate(self.layers):
-      print("Input Shape Before Layer ",layer,"\t",testX.shape)
+      print("Input Shape Before Layer ",(layer+1),"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         preds[forest]=self.layers[layer][forest].predict_proba(testX)
+        print(i,preds[forest].shae)
       for forest in self.layers[layer]:
         testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
+        print("testX:\t",testX.shape)
     return np.mean(np.stack(list(preds.values())), axis=0)
 
     
