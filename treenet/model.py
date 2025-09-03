@@ -41,7 +41,8 @@ class TreeNet:
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         preds[forest]=self.layers[layer][forest].predict_proba(testX)
-        print(i,preds[forest].shae)
+        print(i,preds[forest])
+        print(i,preds[forest].shape)
       for forest in self.layers[layer]:
         testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
         print("testX:\t",testX.shape)
