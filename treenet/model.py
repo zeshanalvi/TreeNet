@@ -105,5 +105,3 @@ class TreeNet:
     print("Model Details")
     print(self.layers)
 
-#treenet=TreeNet(2,3)
-#treenet.summary()
