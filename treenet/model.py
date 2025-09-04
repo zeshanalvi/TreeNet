@@ -35,7 +35,19 @@ class TreeNet:
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY).predict_proba(trainX)
       for forest in self.layers[layer]:
         print(trainX.shape,preds[forest].shape)
-        trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
+        
+        trainX = trainX.reset_index(drop=False)  # keep original string index in a column
+        preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
+        # concat by column (since order matches)
+        trainX = pd.concat([trainX, preds_df], axis=1)
+        # set string index back
+        trainX = trainX.set_index(trainX.columns[0])
+
+
+
+
+
+        #trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
   def predict_prob(self,testX):
     for l,layer in enumerate(self.layers):
       print("Input Shape Before Layer ",layer,"\t",testX.shape)
