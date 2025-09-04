@@ -48,7 +48,7 @@ class TreeNet:
     trainY=self._ensure_numpy(trainY)
     for l,layer in enumerate(self.layers):
       print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
-      print(type(trainX))
+      print(type(trainX),type(trainY))
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
