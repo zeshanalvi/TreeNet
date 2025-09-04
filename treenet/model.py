@@ -35,7 +35,7 @@ class TreeNet:
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY).predict_proba(trainX)
       for forest in self.layers[layer]:
         print(trainX.shape,preds[forest].shape)
-        
+
         trainX = trainX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
         # concat by column (since order matches)
@@ -57,7 +57,13 @@ class TreeNet:
         print(i,preds[forest])
         print(i,preds[forest].shape)
       for forest in self.layers[layer]:
-        testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
+        testX = testX.reset_index(drop=False)  # keep original string index in a column
+        preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
+        # concat by column (since order matches)
+        testX = pd.concat([testX, preds_df], axis=1)
+        # set string index back
+        testX = testX.set_index(testX.columns[0])
+        #testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
         print("testX:\t",testX.shape)
     return np.mean(np.stack(list(preds.values())), axis=0)
 
@@ -69,7 +75,13 @@ class TreeNet:
       for i,forest in enumerate(self.layers[layer]):
         preds[forest]=self.layers[layer][forest].predict_proba(testX)
       for forest in self.layers[layer]:
-        testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
+        testX = testX.reset_index(drop=False)  # keep original string index in a column
+        preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
+        # concat by column (since order matches)
+        testX = pd.concat([testX, preds_df], axis=1)
+        # set string index back
+        testX = testX.set_index(testX.columns[0])
+        #testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
     return np.argmax(np.mean(np.stack(list(preds.values())), axis=0), axis=1).reshape(-1, 1)
 
 
