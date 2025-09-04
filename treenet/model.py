@@ -22,10 +22,24 @@ class TreeNet:
           self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
           self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
           self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,8)*25, random_state=42)
+  
+  def _ensure_dataframe(self, X):
+    """Convert input (DataFrame or ndarray) into a pandas DataFrame"""
+    if isinstance(X, pd.DataFrame):
+        return X
+    elif isinstance(X, np.ndarray):
+        # create default column names col_0, col_1, ...
+        cols = [f"col_{i}" for i in range(X.shape[1])] if X.ndim > 1 else ["col_0"]
+        return pd.DataFrame(X, columns=cols)
+    else:
+        raise TypeError("Input must be a pandas DataFrame or numpy ndarray")
     
   def train(self,trainX,trainY):
+    trainX=self._ensure_dataframe(trainX)
+    trainY=self._ensure_dataframe(trainY)
     for l,layer in enumerate(self.layers):
       print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
+      print(type(trainX))
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
@@ -49,6 +63,7 @@ class TreeNet:
 
         #trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
   def predict_prob(self,testX):
+    testX=self._ensure_dataframe(testX)
     for l,layer in enumerate(self.layers):
       print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
@@ -69,6 +84,7 @@ class TreeNet:
 
     
   def predict(self,testX):
+    testX=self._ensure_dataframe(testX)
     for l,layer in enumerate(self.layers):
       print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
