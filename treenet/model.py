@@ -33,10 +33,19 @@ class TreeNet:
         return pd.DataFrame(X, columns=cols)
     else:
         raise TypeError("Input must be a pandas DataFrame or numpy ndarray")
-    
+  
+  def _ensure_numpy(self, X):
+    """Convert input (DataFrame or ndarray) into a NumPy array"""
+    if isinstance(X, pd.DataFrame):
+        return X.values   # extract numpy array
+    elif isinstance(X, np.ndarray):
+        return X
+    else:
+        raise TypeError("Input must be a pandas DataFrame or numpy ndarray")
+          
   def train(self,trainX,trainY):
     trainX=self._ensure_dataframe(trainX)
-    trainY=self._ensure_dataframe(trainY)
+    trainY=self._ensure_numpy(trainY)
     for l,layer in enumerate(self.layers):
       print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
       print(type(trainX))
