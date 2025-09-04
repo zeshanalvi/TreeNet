@@ -47,8 +47,8 @@ class TreeNet:
     trainX=self._ensure_dataframe(trainX)
     trainY=self._ensure_numpy(trainY)
     for l,layer in enumerate(self.layers):
-      print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
-      print(type(trainX),type(trainY))
+      #print("Training Layer\t",l+1,"\t with input\t",trainX.shape)
+      #print(type(trainX),type(trainY))
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
@@ -57,7 +57,7 @@ class TreeNet:
         else:
           preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict_proba(trainX)
       for forest in self.layers[layer]:
-        print(trainX.shape,preds[forest].shape)
+        #print(trainX.shape,preds[forest].shape)
 
         trainX = trainX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
@@ -65,21 +65,16 @@ class TreeNet:
         trainX = pd.concat([trainX, preds_df], axis=1)
         # set string index back
         trainX = trainX.set_index(trainX.columns[0])
-
-
-
-
-
         #trainX=trainX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
   def predict_prob(self,testX):
     testX=self._ensure_dataframe(testX)
     for l,layer in enumerate(self.layers):
-      print("Input Shape Before Layer ",layer,"\t",testX.shape)
+      #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         preds[forest]=self.layers[layer][forest].predict_proba(testX)
-        print(i,preds[forest])
-        print(i,preds[forest].shape)
+        #print(i,preds[forest])
+        #print(i,preds[forest].shape)
       for forest in self.layers[layer]:
         testX = testX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
@@ -88,14 +83,14 @@ class TreeNet:
         # set string index back
         testX = testX.set_index(testX.columns[0])
         #testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
-        print("testX:\t",testX.shape)
+        #print("testX:\t",testX.shape)
     return np.mean(np.stack(list(preds.values())), axis=0)
 
     
   def predict(self,testX):
     testX=self._ensure_dataframe(testX)
     for l,layer in enumerate(self.layers):
-      print("Input Shape Before Layer ",layer,"\t",testX.shape)
+      #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
         preds[forest]=self.layers[layer][forest].predict_proba(testX)
