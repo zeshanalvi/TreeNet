@@ -51,9 +51,4 @@ def read_files(base_path):
   return trainX,trainY,testX,testY
 
 
-
-
-
-
-
-read_files(base_path="/kaggle/input/kvasirv1/")
+#read_files(base_path="/kaggle/input/kvasirv1/")
