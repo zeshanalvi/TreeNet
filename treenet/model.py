@@ -3,8 +3,11 @@ from sklearn.ensemble import RandomForestClassifier,BaggingClassifier, ExtraTree
 import numpy as np, pandas as pd, random
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
-class TreeNet:
+import torch.nn as nn
+
+class TreeNet(nn.Module):
   def __init__(self,layer_count=2,breath_count=1):
+    super(TreeNet, self).__init__()
     self.layers={}
     self.layer_count=layer_count
     self.breath_count=breath_count
