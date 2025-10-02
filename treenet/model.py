@@ -35,8 +35,8 @@ class TreeNet(nn.Module):
             self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingClassifier(DecisionTreeClassifier(max_depth=10, random_state=42), n_estimators=random.randint(1,8)*25, random_state=42)
           else:
             self.layers["layer_"+str(i)]["XG_1_"+str(b)]=XGBRegressor()
-            self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
-            self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+            self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='RMSE', random_state=42)
+            self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='RMSE', random_state=42)
             self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingRegressor(DecisionTreeRegressor(max_depth=10, random_state=42), n_estimators=random.randint(1,8)*25, random_state=42)
   
   def _ensure_dataframe(self, X):
