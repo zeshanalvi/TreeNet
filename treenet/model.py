@@ -113,7 +113,7 @@ class TreeNet(nn.Module):
         if(self.classifier):
           preds[forest]=self.layers[layer][forest].predict_proba(testX)
         else:
-          preds[forest]=self.layers[layer][forest].predict_proba(testX)
+          preds[forest]=self.layers[layer][forest].predict(testX)
       for forest in self.layers[layer]:
         testX = testX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
