@@ -1,12 +1,12 @@
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier,BaggingClassifier, ExtraTreesClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.ensemble import RandomForestClassifier,BaggingClassifier, ExtraTreesClassifier, RandomForestRegressor, ExtraTreesRegressor, BaggingRegressor
 import numpy as np, pandas as pd, random
-from xgboost import XGBClassifier
-from catboost import CatBoostClassifier
+from xgboost import XGBClassifier, XGBRegressor
+from catboost import CatBoostClassifier, CatBoostRegressor
 import torch.nn as nn
 
 class TreeNet(nn.Module):
-  def __init__(self,layer_count=2,breath_count=1):
+  def __init__(self,layer_count=2,breath_count=1,classifier=True):
     super(TreeNet, self).__init__()
     self.layers={}
     self.layer_count=layer_count
@@ -15,16 +15,28 @@ class TreeNet(nn.Module):
       self.layers["layer_"+str(i)]={}
       if(i%2==0):
         for b in range(self.breath_count):
-          self.layers["layer_"+str(i)]["RF_1_"+str(b)]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
-          self.layers["layer_"+str(i)]["RF_2_"+str(b)]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
-          self.layers["layer_"+str(i)]["ET_3_"+str(b)]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
-          self.layers["layer_"+str(i)]["ET_4_"+str(b)]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+          if(classifier):
+            self.layers["layer_"+str(i)]["RF_1_"+str(b)]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["RF_2_"+str(b)]=RandomForestClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["ET_3_"+str(b)]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["ET_4_"+str(b)]=ExtraTreesClassifier(n_estimators=random.randint(1,8)*25, random_state=42)
+          else:
+            self.layers["layer_"+str(i)]["RF_1_"+str(b)]=RandomForestRegressor(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["RF_2_"+str(b)]=RandomForestRegressor(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["ET_3_"+str(b)]=ExtraTreesRegressor(n_estimators=random.randint(1,8)*25, random_state=42)
+            self.layers["layer_"+str(i)]["ET_4_"+str(b)]=ExtraTreesRegressor(n_estimators=random.randint(1,8)*25, random_state=42)
       else:
         for b in range(self.breath_count):
-          self.layers["layer_"+str(i)]["XG_1_"+str(b)]=XGBClassifier()
-          self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
-          self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
-          self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingClassifier(DecisionTreeClassifier(), n_estimators=random.randint(1,8)*25, random_state=42)
+          if(classifier):
+            self.layers["layer_"+str(i)]["XG_1_"+str(b)]=XGBClassifier()
+            self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+            self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostClassifier(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+            self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingClassifier(DecisionTreeClassifier(max_depth=10, random_state=42), n_estimators=random.randint(1,8)*25, random_state=42)
+          else:
+            self.layers["layer_"+str(i)]["XG_1_"+str(b)]=XGBRegressor()
+            self.layers["layer_"+str(i)]["CB_2_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+            self.layers["layer_"+str(i)]["CB_3_"+str(b)]=CatBoostRegressor(iterations=random.randint(1,8)*25, learning_rate=0.1, depth=6, loss_function='MultiClass', random_state=42)
+            self.layers["layer_"+str(i)]["BC_4_"+str(b)]=BaggingRegressor(DecisionTreeRegressor(max_depth=10, random_state=42), n_estimators=random.randint(1,8)*25, random_state=42)
   
   def _ensure_dataframe(self, X):
     """Convert input (DataFrame or ndarray) into a pandas DataFrame"""
