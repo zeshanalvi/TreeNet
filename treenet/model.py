@@ -90,7 +90,10 @@ class TreeNet(nn.Module):
       #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
-        preds[forest]=self.layers[layer][forest].predict_proba(testX)
+        if(self.classfier):
+          preds[forest]=self.layers[layer][forest].predict_proba(testX)
+        else:
+          preds[forest]=self.layers[layer][forest].predict(testX)
       for forest in self.layers[layer]:
         testX = testX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
@@ -107,7 +110,10 @@ class TreeNet(nn.Module):
       #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
-        preds[forest]=self.layers[layer][forest].predict_proba(testX)
+        if(self.classfier):
+          preds[forest]=self.layers[layer][forest].predict_proba(testX)
+        else:
+          preds[forest]=self.layers[layer][forest].predict_proba(testX)
       for forest in self.layers[layer]:
         testX = testX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
