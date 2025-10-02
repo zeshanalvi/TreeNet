@@ -9,6 +9,7 @@ class TreeNet(nn.Module):
   def __init__(self,layer_count=2,breath_count=1,classifier=True):
     super(TreeNet, self).__init__()
     self.layers={}
+    self.classifier=classifier
     self.layer_count=layer_count
     self.breath_count=breath_count
     for i in range(layer_count):
@@ -67,9 +68,15 @@ class TreeNet(nn.Module):
       for i,forest in enumerate(self.layers[layer]):
         if("CB_" in forest):
           #trainX = trainX.apply(pd.to_numeric, downcast="float")
-          preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0).predict_proba(trainX)
+          if(self.classifier):
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0).predict_proba(trainX)
+          else:
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0).predict(trainX)
         else:
-          preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict_proba(trainX)
+          if(self.classifier):
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict_proba(trainX)
+          else:
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict(trainX)
       for forest in self.layers[layer]:
         trainX = trainX.reset_index(drop=False)  # keep original string index in a column
         preds_df = pd.DataFrame(preds[forest]).add_suffix("_" + layer + "_" + forest)
