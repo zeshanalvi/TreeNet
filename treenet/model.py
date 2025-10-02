@@ -122,9 +122,11 @@ class TreeNet(nn.Module):
         # set string index back
         testX = testX.set_index(testX.columns[0])
         #testX=testX.merge(pd.DataFrame(preds[forest]).add_suffix("_"+layer+"_"+forest), left_index=True, right_index=True,copy=True)
-    print(preds.values())
-    print(preds.values().shape)
-    pred1 = np.argmax(np.mean(np.stack(list(preds.values())), axis=0), axis=1).reshape(-1, 1)
+    #print(preds.values())
+    if(self.classifier):
+      pred1 = np.argmax(np.mean(np.stack(list(preds.values())), axis=0), axis=1).reshape(-1, 1)
+    else:
+      pred1 = np.mean(np.stack(list(preds.values())), axis=0).reshape(-1, 1)
     return pred1
 
 
