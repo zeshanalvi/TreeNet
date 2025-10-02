@@ -90,7 +90,7 @@ class TreeNet(nn.Module):
       #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
-        if(self.classfier):
+        if(self.classifier):
           preds[forest]=self.layers[layer][forest].predict_proba(testX)
         else:
           preds[forest]=self.layers[layer][forest].predict(testX)
@@ -110,7 +110,7 @@ class TreeNet(nn.Module):
       #print("Input Shape Before Layer ",layer,"\t",testX.shape)
       preds={}
       for i,forest in enumerate(self.layers[layer]):
-        if(self.classfier):
+        if(self.classifier):
           preds[forest]=self.layers[layer][forest].predict_proba(testX)
         else:
           preds[forest]=self.layers[layer][forest].predict_proba(testX)
