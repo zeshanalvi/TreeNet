@@ -4,10 +4,13 @@ import numpy as np, pandas as pd, random
 from xgboost import XGBClassifier, XGBRegressor
 from catboost import CatBoostClassifier, CatBoostRegressor
 import torch.nn as nn
+import joblib
+import collections
+import os
 
-class TreeNet(nn.Module):
+
+class TreeNet():
   def __init__(self,layer_count=2,breath_count=1,classifier=True):
-    super(TreeNet, self).__init__()
     self.layers={}
     self.classifier=classifier
     self.layer_count=layer_count
@@ -69,9 +72,9 @@ class TreeNet(nn.Module):
         if("CB_" in forest):
           #trainX = trainX.apply(pd.to_numeric, downcast="float")
           if(self.classifier):
-            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0).predict_proba(trainX)
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0,silent=True).predict_proba(trainX)
           else:
-            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0).predict(trainX)
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0,silent=True).predict(trainX)
         else:
           if(self.classifier):
             preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict_proba(trainX)
@@ -137,4 +140,34 @@ class TreeNet(nn.Module):
     print("Model Layer Breath is "+str(self.breath_count))
     print("Model Details")
     print(self.layers)
+  
+  def save_treenet(self, folder_path="treenet_model"):
+    os.makedirs(folder_path, exist_ok=True)  
+    metadata = {
+        "layer_count": self.layer_count,
+        "breath_count": self.breath_count,
+        "classifier": self.classifier
+    }
+    joblib.dump(metadata, os.path.join(folder_path, "metadata.pkl"))
+    # Save each layer's models
+    for layer_name, layer_models in self.layers.items():
+        layer_folder = os.path.join(folder_path, layer_name)
+        os.makedirs(layer_folder, exist_ok=True)
+        for model_name, m in layer_models.items():
+            joblib.dump(m, os.path.join(layer_folder, model_name + ".pkl"))
 
+  def load_treenet(self,folder_path="treenet_model"):
+    # Load metadata
+    metadata = joblib.load(os.path.join(folder_path, "metadata.pkl"))
+    # Recreate TreeNet object
+    self.layer_count=metadata["layer_count"]
+    self.breath_count=metadata["breath_count"]
+    self.classifier=metadata["classifier"]
+    
+    # Replace models in each layer
+    for layer_name in self.layers:
+        layer_folder = os.path.join(folder_path, layer_name)
+        for model_name in self.layers[layer_name]:
+            self.layers[layer_name][model_name] = joblib.load(
+                os.path.join(layer_folder, model_name + ".pkl")
+            )
