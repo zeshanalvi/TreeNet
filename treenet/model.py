@@ -72,9 +72,9 @@ class TreeNet():
         if("CB_" in forest):
           #trainX = trainX.apply(pd.to_numeric, downcast="float")
           if(self.classifier):
-            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0,silent=True).predict_proba(trainX)
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),silent=True).predict_proba(trainX)
           else:
-            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),verbose=0,silent=True).predict(trainX)
+            preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel(),silent=True).predict(trainX)
         else:
           if(self.classifier):
             preds[forest]=self.layers[layer][forest].fit(trainX, trainY.ravel()).predict_proba(trainX)
