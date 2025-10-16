@@ -171,3 +171,35 @@ class TreeNet():
             self.layers[layer_name][model_name] = joblib.load(
                 os.path.join(layer_folder, model_name + ".pkl")
             )
+
+  import joblib
+
+  def save(self, file_path="treenet_model.pkl"):
+      """
+      Save the complete TreeNet model — including all layers and classifiers — into a single file.
+      """
+      # Pack the model data into one dictionary
+      treenet_package = {
+          "layer_count": self.layer_count,
+          "breath_count": self.breath_count,
+          "layers": self.layers
+      }
+
+      # Save as one compressed file
+      joblib.dump(treenet_package, file_path, compress=3)
+      print(f"✅ TreeNet model saved successfully to {file_path}")
+
+
+  def load(self, file_path="treenet_model.pkl"):
+      """
+      Load the complete TreeNet model (all layers and classifiers) from a single file.
+      """
+      # Load the dictionary from file
+      treenet_package = joblib.load(file_path)
+
+      # Restore the structure
+      self.layer_count = treenet_package["layer_count"]
+      self.breath_count = treenet_package["breath_count"]
+      self.layers = treenet_package["layers"]
+
+      print(f"✅ TreeNet model loaded successfully from {file_path}")
