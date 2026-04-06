@@ -187,7 +187,7 @@ class TreeNet():
 
       # Save as one compressed file
       joblib.dump(treenet_package, file_path, compress=3)
-      print(f"✅ TreeNet model saved successfully to {file_path}")
+      print(f"TreeNet model saved successfully to {file_path}")
 
 
   def load(self, file_path="treenet_model.pkl"):
@@ -202,4 +202,4 @@ class TreeNet():
       self.breath_count = treenet_package["breath_count"]
       self.layers = treenet_package["layers"]
 
-      print(f"✅ TreeNet model loaded successfully from {file_path}")
+      print(f"TreeNet model loaded successfully from {file_path}")
